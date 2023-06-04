@@ -47,9 +47,13 @@ export function activate(context: vscode.ExtensionContext) {
 						selectedText = selectedText.trim();
 						const unquotedText = selectedText.replace(/^['"]\s*(.*?)\s*['"]$/, '$1');
 						const arbContents = fs.readFileSync(arbPath!, 'utf8');
-                        const arbJson = JSON.parse(arbContents);
-                        arbJson[key] = unquotedText;
-                        fs.writeFileSync(arbPath!, JSON.stringify(arbJson, null, 2));
+						const arbJson = JSON.parse(arbContents);
+						arbJson[key] = unquotedText;
+						const sortedArbJson: { [key: string]: string } = {};
+						Object.keys(arbJson).sort().forEach(function (key) {
+							sortedArbJson[key] = arbJson[key];
+						});
+						fs.writeFileSync(arbPath!, JSON.stringify(sortedArbJson, null, 2));
 						editor.edit((editBuilder) => {
 							editBuilder.replace(selection, `AppLocalization.of(context).${key}`);
 						});
